@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/SolutionItems/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="AccountManagementService.API/AccountManagementService.API.csproj" Id="fd6fefd5-1f08-45b4-bc48-8cd0f8298c3f" />
+    <Project Path="AccountManagementService.Business/AccountManagementService.Business.csproj" Id="d6ba5655-15c6-4631-83bb-95801e271bab" />
+    <Project Path="AccountManagementService.CrossCutting/AccountManagementService.CrossCutting.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
