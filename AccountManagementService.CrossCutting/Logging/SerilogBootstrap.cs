@@ -27,6 +27,10 @@ namespace AccountManagementService.CrossCutting.Logging
             var auditFormatter = new ExpressionTemplate(AuditJsonTemplate);
             var businessFormatter = new ExpressionTemplate(BusinessJsonTemplate);
             var debugFormatter = new ExpressionTemplate(DebugJsonTemplate);
+            var jsonFormatter = new FlatJsonFormatter();
+
+            var logBaseDir = Path.Combine(AppContext.BaseDirectory, "logs");
+            Directory.CreateDirectory(logBaseDir);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -34,9 +38,8 @@ namespace AccountManagementService.CrossCutting.Logging
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithThreadId()
                 .Enrich.WithProperty(LogCategoryConstants.PropertyName, LogCategoryConstants.Business)
+                .Enrich.With(new AmbientRecordEnricher())
 
                 // 1. Console Sink (Information+)
                 .WriteTo.Console(
@@ -47,10 +50,11 @@ namespace AccountManagementService.CrossCutting.Logging
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(Matching.WithProperty(LogCategoryConstants.PropertyName, LogCategoryConstants.Audit))
                     .WriteTo.Async(a => a.File(
-                        formatter: auditFormatter,
-                        path: "logs/audit/audit-.json",
+                        formatter: jsonFormatter,
+                        path: Path.Combine(logBaseDir, "audit", "audit-.json"),
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: 365,
+                        flushToDiskInterval: TimeSpan.FromSeconds(1),
                         shared: true)))
 
                 // 3. Business Log File (JSON, Information+, 60 days retention, 100MB roll)
@@ -60,8 +64,8 @@ namespace AccountManagementService.CrossCutting.Logging
                         (Matching.WithProperty(LogCategoryConstants.PropertyName, LogCategoryConstants.Business)(e) ||
                          Matching.FromSource("EnterpriseApi")(e)))
                     .WriteTo.Async(a => a.File(
-                        formatter: businessFormatter,
-                        path: "logs/business/business-.json",
+                        formatter: jsonFormatter,
+                        path: Path.Combine(logBaseDir, "business", "business-.json"),
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: 60,
                         fileSizeLimitBytes: 100 * 1024 * 1024,
@@ -73,8 +77,8 @@ namespace AccountManagementService.CrossCutting.Logging
                         e.Level <= LogEventLevel.Debug ||
                         Matching.WithProperty(LogCategoryConstants.PropertyName, LogCategoryConstants.Debug)(e))
                     .WriteTo.Async(a => a.File(
-                        formatter: debugFormatter,
-                        path: "logs/debug/debug-.json",
+                        formatter: jsonFormatter,
+                        path: Path.Combine(logBaseDir, "debug", "debug-.json"),
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: 7,
                         fileSizeLimitBytes: 2 * 1024 * 1024,
@@ -85,6 +89,7 @@ namespace AccountManagementService.CrossCutting.Logging
             builder.Host.UseSerilog(Log.Logger, dispose: true);
 
             builder.Services.AddScoped<IAuditLogger, AuditLogger>();
+
             return builder;
         }
 

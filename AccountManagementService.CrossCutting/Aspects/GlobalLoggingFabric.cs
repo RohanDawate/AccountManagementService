@@ -1,7 +1,7 @@
 ﻿using AccountManagementService.CrossCutting.Attributes;
+using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Fabrics;
-using Metalama.Framework.Aspects;
 
 namespace AccountManagementService.CrossCutting.Aspects
 {
@@ -15,10 +15,12 @@ namespace AccountManagementService.CrossCutting.Aspects
                     !t.IsImplicitlyDeclared &&
                     t.TypeKind is TypeKind.Class || t.IsRecord &&
                     !t.Attributes.Any(typeof(NoLogAttribute)) &&
-                    !t.Name.EndsWith("Middleware") &&
-                    !t.Name.EndsWith("Aspect") &&
-                    !t.Name.EndsWith("Fabric") &&
-                    !t.Name.EndsWith("Bootstrap"))
+
+                // ONLY weave Controllers, Services, and Repositories!
+                (t.Name.EndsWith("Controller") ||
+                 t.ContainingNamespace.FullName.Contains(".Business") ||
+                 t.ContainingNamespace.FullName.Contains(".Features")))
+
                 .SelectMany(t => t.Methods)
                 .Where(m =>
                     m.Accessibility is Accessibility.Public or Accessibility.Internal &&
