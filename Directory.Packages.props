@@ -3,27 +3,24 @@
     <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-  
   <!-- ASP.Net Core Packages -->
   <ItemGroup>
+    <PackageVersion Include="FluentValidation" Version="12.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageVersion Include="Scalar.AspNetCore" Version="3.2.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="11.0.1" />
   </ItemGroup>
-  
   <!-- Fluent Validation -->
   <ItemGroup>
   </ItemGroup>
-  
   <!-- Interception framework and dependency injection -->
   <ItemGroup>
+    <PackageVersion Include="Mapster" Version="10.0.14" />
     <PackageVersion Include="Metalama.Framework" Version="2026.1.33" />
   </ItemGroup>
-  
   <!-- Logging -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="11.0.0" />
-  
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="11.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />

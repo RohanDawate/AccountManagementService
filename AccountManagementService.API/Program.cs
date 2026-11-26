@@ -1,8 +1,7 @@
 
 using AccountManagementService.API.Middleware;
-using AccountManagementService.API.Services;
+using AccountManagementService.API.Shared.Middleware;
 using AccountManagementService.Business;
-using AccountManagementService.CrossCutting.Interfaces;
 using AccountManagementService.CrossCutting.Logging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
@@ -15,12 +14,15 @@ namespace AccountManagementService.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+            // 1. Register IAppLogger in the DI container
+            builder.Services.AddTransient(typeof(IAppLogger<>), typeof(AppLogger<>));
+
             // 1. Plug in Enterprise Logging (Configured inside CrossCutting/Logging/SerilogBootstrap.cs)
             builder.AddEnterpriseLogging();
 
             // 2. Enable HttpContextAccessor (Required for LogRecordContext & TraceContext across the HTTP request)
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped<ITraceContext, TraceContext>();
 
             // 3. Register Business & API Services
             builder.Services.AddBusinessServices();
@@ -60,6 +62,7 @@ namespace AccountManagementService.API
 
             // 2. Now run Correlation & Trace Middleware for actual API requests
             app.UseMiddleware<CorrelationAndTraceMiddleware>();
+            app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseAuthorization();

@@ -1,3 +1,4 @@
+using AccountManagementService.API.Shared.Attributes;
 using AccountManagementService.Business;
 using AccountManagementService.CrossCutting;
 using AccountManagementService.CrossCutting.Logging;
@@ -7,11 +8,12 @@ namespace AccountManagementService.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [RequireApiKey]
     public sealed class WeatherForecastController : AppControllerBase
     {
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IAppLogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IAppLogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }

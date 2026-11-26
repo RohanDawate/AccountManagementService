@@ -9,6 +9,9 @@ indent_style = space
 indent_size = 2
 
 [*.cs] 
+# Throw error if ILogger is used
+dotnet_diagnostic.RS0030.severity = error
+
 # Suppress CA1859 (prefer concrete types) 
 dotnet_diagnostic.CA1859.severity = none
 
